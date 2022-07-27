@@ -1,6 +1,10 @@
-(setq log-buffer (get-buffer-create "esm-log-buffer"))
+(setq esm/log-buffer (get-buffer-create "esm-log-buffer"))
 
 (setq esm/services nil)
+
+(defstruct procd
+  proc-obj
+  log-buffer)
 
 (defun esm/start-process (name shell-cmd &optional dedicated-log-buffer)
   (interactive)
@@ -20,10 +24,12 @@
 
 (defun esm/kill-process (name &optional kill-dedicated-buffer)
   (interactive)
-  (switch-to-buffer log-buffer)
-  (kill-process (assoc name esm/services))
-  (when kill-dedicated-buffer (kill-buffer name)))
+  (with-current-buffer log-buffer
+	(let ((proc (assq name esm/services)))
+	(kill-process proc)
+	(setq esm/services (assq-delete-all (intern name) esm/services))
+	(when kill-dedicated-buffer (kill-buffer name)))))
 
-(esm/start-process-once "some" "/bin/pwd")
-(esm/kill-process "some")
+(esm/start-process-once "meer" "/bin/pnmixer")
+(esm/kill-process "meer")
 
