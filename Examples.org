@@ -1,0 +1,81 @@
+#+title: Eservice-manager examples
+
+* Start process
+Functions to start processes with *eservice-manager*
+** start-process
+Start process with a *name* and a *shell command*. Return a cons of a *name* and a created proces.
+
+#+begin_src emacs-lisp
+;; Runs 3 times
+(esm/start-process "pwd" "/bin/pwd")
+(esm/start-process "pwd" "/bin/pwd")
+(esm/start-process "pwd" "/bin/pwd")
+#+end_src
+
+** start-process-once
+Start process with a *name* and a *shell command*. Return a cons of a *name* and a created proces.  
+Do nothing and return *nil* if there is a process with a given name registered by *eservice-manager*
+
+#+begin_src emacs-lisp
+(esm/start-process-once "pwd" "/bin/pwd")
+
+;; the second evaluation does not have any effect
+
+(esm/start-process-once "pwd" "/bin/pwd")
+#+end_src
+
+** Start process with dedicated log buffer
+By default processes created with *esm/start-process* and *esm/start-process-once* are associated with *esm-log-buffer*
+However both of the functions above accept an optional argument:non-nil value tells *eservice-manager*
+to create a separate buffer for that process that you can later inspect yourself.
+#+begin_src emacs-lisp
+;; start-process
+(esm/start-process "pwd" "/bin/pwd" t)
+(esm/start-process "pwd" "/bin/pwd" t)
+(esm/start-process "pwd" "/bin/pwd" t)
+
+;; start-process-once
+(esm/start-process-once "pwd" "/bin/pwd" t)
+
+;; the second evaluation still does not have any effect
+
+(esm/start-process-once "pwd" "/bin/pwd")
+#+end_src
+
+* Kill process
+Functions to kill processes started with *eservice-manager* 
+** kill-process
+Kill process with *name*
+Return *t* on success and *nil* if no process with a given name was found
+#+begin_src emacs-lisp
+(esm/start-process-once "loop" "while :; do sleep 1; done")
+
+(esm/kill-process "loop")
+#+end_src
+
+** kill-all
+Kill all processes under the control of *eservice-manager*
+Return *t* on success and *nil* if no running processes were found
+#+begin_src emacs-lisp
+(esm/start-process-once "loop" "while :; do sleep 1; done")
+(esm/start-process-once "loop1" "while :; do sleep 1; done")
+(esm/start-process-once "loop2" "while :; do sleep 1; done")
+
+(esm/kill-all)
+#+end_src
+
+** Kill process with dedicated buffer
+Add non-nil value to the argument list of *esm/kill-process* and *esm/kill-all* functions to kill the buffers associated with the process
+(if any were create by starting the process with dedicated buffer)
+#+begin_src emacs-lisp
+;; kill-all
+(esm/start-process-once "loop" "while :; do sleep 1; done" t)
+(esm/start-process-once "loop1" "while :; do sleep 1; done" t)
+(esm/start-process-once "loop2" "while :; do sleep 1; done" t)
+
+(esm/kill-all t)
+;; kill-process
+(esm/start-process-once "loop" "while :; do sleep 1; done" t)
+
+(esm/kill-process "loop" t)
+#+end_src

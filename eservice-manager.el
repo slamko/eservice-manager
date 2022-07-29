@@ -28,23 +28,28 @@
 
 (defun esm/do-kill-proc (proc &optional kill-proc-buffer)
   (when proc
+	(progn
 	  (with-current-buffer (procd-log-buffer proc)
-		(kill-process (procd-proc-obj proc)))))
+		(kill-process (procd-proc-obj proc)))
+	  t)))
 
-(defun esm/kill-process (name &optional kill-process-buffer)
+(defun esm/kill-process (name &optional kill-proc-buffer)
   "Kill process with name NAME"
   (interactive)
   (let ((proc (cdr (assq (intern name) esm/services))))
-	(esm/do-kill-proc proc kill-process-buffer)
-	(setq esm/services (assq-delete-all (intern name) esm/services))
-	(when kill-proc-buffer (kill-buffer name))))
+	(let ((result (esm/do-kill-proc proc kill-proc-buffer)))
+	  (setq esm/services (assq-delete-all (intern name) esm/services))
+	  (when kill-proc-buffer (kill-buffer name))
+	  result)))
 
-(defun esm/kill-all (&optional kill-process-buffers)
+(defun esm/kill-all (&optional kill-proc-buffers)
   "Kill all services under the control of 'eservice-manager'"
   (interactive)
-  (dolist (proc esm/services)
-	(esm/do-kill-proc (cdr proc) kill-process-buffers)
-	(setq esm/services (assq-delete-all (car proc) esm/services))
-	(when kill-proc-buffer (kill-buffer name))))
+  (let (result)
+	(dolist (proc esm/services result)
+	  (setq result t)
+	  (esm/do-kill-proc (cdr proc) kill-proc-buffers)
+	  (setq esm/services (assq-delete-all (car proc) esm/services))
+	  (when kill-proc-buffers (kill-buffer (prin1-to-string (car proc)))))))
   
 (provide 'eservice-manager)
