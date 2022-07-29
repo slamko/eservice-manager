@@ -30,8 +30,14 @@
   (when proc
 	(progn
 	  (with-current-buffer (procd-log-buffer proc)
-		(kill-process (procd-proc-obj proc)))
-	  t)))
+		  (kill-process (procd-proc-obj proc))
+	  t))))
+
+(defun esm/do-kill-buffer (name)
+  (let ((kill-buffer-std-query (copy-tree kill-buffer-query-functions)))
+	(setq kill-buffer-query-functions (delq 'process-kill-buffer-query-function kill-buffer-query-functions))
+	(kill-buffer name)
+	(setq kill-buffer-query-functions kill-buffer-std-query)))
 
 (defun esm/kill-process (name &optional kill-proc-buffer)
   "Kill process with name NAME"
@@ -39,7 +45,7 @@
   (let ((proc (cdr (assq (intern name) esm/services))))
 	(let ((result (esm/do-kill-proc proc kill-proc-buffer)))
 	  (setq esm/services (assq-delete-all (intern name) esm/services))
-	  (when kill-proc-buffer (kill-buffer name))
+	  (when kill-proc-buffer (esm/do-kill-buffer name))
 	  result)))
 
 (defun esm/kill-all (&optional kill-proc-buffers)
@@ -50,6 +56,6 @@
 	  (setq result t)
 	  (esm/do-kill-proc (cdr proc) kill-proc-buffers)
 	  (setq esm/services (assq-delete-all (car proc) esm/services))
-	  (when kill-proc-buffers (kill-buffer (prin1-to-string (car proc)))))))
+	  (when kill-proc-buffers (esm/do-kill-buffer (car proc))))))
   
 (provide 'eservice-manager)
