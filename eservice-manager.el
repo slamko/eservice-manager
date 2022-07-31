@@ -1,10 +1,26 @@
+;; eservice-manager.el - GNU Emacs extension for managing services when using Emacs as a Desktop Environment. 
+
+;; Copyright (C) 2022 Viacheslav Chepelyk-Kozhin.
+;;
+;; This program is free software: you can redistribute it and/or modify it under
+;; the terms of the GNU General Public License as published by the Free Software
+;; Foundation, either version 3 of the License, or (at your option) any later version.
+;; This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+;; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+;; See the GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+
+(require 'cl-lib)
+
 (defconst esm/log-buffer (get-buffer-create "esm-log-buffer")
   "Default buffer running all the services")
 
 (defvar-local esm/services nil)
 
-(defstruct procd
-  proc-obj
+(cl-defstruct procd
+  (proc-obj nil)
   (log-buffer esm/log-buffer))
 
 (defun esm/start-process (name shell-cmd &optional dedicated-log-buffer)
