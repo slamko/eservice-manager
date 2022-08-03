@@ -1,0 +1,16 @@
+* Emacs service manager
+  Provides:
+  1. *esm/start-process* - start asynchronous process with a name and a shell command.
+  2. *esm/start-process-once* - checks if the process with a given name already exist.
+  
+  3. *esm/kill-process* - kill process by name and optionaly a buffer associated with it.
+  4. *esm/kill-all* - kill all processes under the control of *esm*.
+
+  See the usage in Examples.org
+
+** Installation
+#+begin_src emacs-lisp
+(straight-use-package
+ '(eservice-manager :host github :repo "slamko/emacs-service-manager"
+            :branch "master"))
+#+end_src
