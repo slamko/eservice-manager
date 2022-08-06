@@ -7,9 +7,9 @@ Start process with a *name* and a *shell command*. Return a cons of a *name* and
 
 #+begin_src emacs-lisp
 ;; Runs 3 times
-(esm/start-process "pwd" "/bin/pwd")
-(esm/start-process "pwd" "/bin/pwd")
-(esm/start-process "pwd" "/bin/pwd")
+(esm/start-process "pwd" "/bin/pwd" t)
+(esm/start-process "pwd" "/bin/pwd" t)
+(esm/start-process "pwd" "/bin/pwd" t)
 #+end_src
 
 ** start-process-once
@@ -17,11 +17,11 @@ Start process with a *name* and a *shell command*. Return a cons of a *name* and
 Do nothing and return *nil* if there is a process with a given name registered by *eservice-manager*
 
 #+begin_src emacs-lisp
-(esm/start-process-once "pwd" "/bin/pwd")
+(esm/start-process-once "pwd" "/bin/pwd" nil)
 
 ;; the second evaluation does not have any effect
 
-(esm/start-process-once "pwd" "/bin/pwd")
+(esm/start-process-once "pwd" "/bin/pwd" nil)
 #+end_src
 
 ** Start process with dedicated log buffer
@@ -48,7 +48,7 @@ Functions to kill processes started with *eservice-manager*
 Kill process with *name*
 Return *t* on success and *nil* if no process with a given name was found
 #+begin_src emacs-lisp
-(esm/start-process-once "loop" "while :; do sleep 1; done")
+(esm/start-process-once "loop" "while :; do sleep 1; done" t)
 
 (esm/kill-process "loop")
 #+end_src
@@ -57,9 +57,9 @@ Return *t* on success and *nil* if no process with a given name was found
 Kill all processes under the control of *eservice-manager*
 Return *t* on success and *nil* if no running processes were found
 #+begin_src emacs-lisp
-(esm/start-process-once "loop" "while :; do sleep 1; done")
-(esm/start-process-once "loop1" "while :; do sleep 1; done")
-(esm/start-process-once "loop2" "while :; do sleep 1; done")
+(esm/start-process-once "loop" "while :; do sleep 1; done" t)
+(esm/start-process-once "loop1" "while :; do sleep 1; done" t)
+(esm/start-process-once "loop2" "while :; do sleep 1; done" t)
 
 (esm/kill-all)
 #+end_src

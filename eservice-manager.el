@@ -21,11 +21,12 @@
 
 (cl-defstruct procd
   (proc-obj nil)
-  (log-buffer esm/log-buffer))
+  (log-buffer nil))
 
-(defun esm/start-process (name shell-cmd &optional dedicated-log-buffer)
+(defun esm/start-process (name shell-cmd use-log-buffer &optional dedicated-buffer)
   (interactive)
-  (let* ((proc-buffer (if dedicated-log-buffer (get-buffer-create name) esm/log-buffer))
+  (let* ((proc-buffer
+          (when use-log-buffer (if dedicated-buffer (get-buffer-create name) esm/log-buffer)))
 		(proc (start-process-shell-command
 			   name
 			   proc-buffer
@@ -34,15 +35,15 @@
 	 :proc-obj proc
 	 :log-buffer proc-buffer)))
 
-(defun esm/start-process-once (name shell-cmd &optional dedicated-log-buffer)
+(defun esm/start-process-once (name shell-cmd use-log-buffer &optional dedicated-buffer)
   (interactive)
   (if (not (assq (intern name) esm/services))
 	  (progn
-		(let ((new-proc (esm/start-process name shell-cmd dedicated-log-buffer)))
+		(let ((new-proc (esm/start-process name shell-cmd use-log-buffer dedicated-buffer)))
 		  (setq esm/services
 				(push (cons (intern name) new-proc) esm/services))))))
 
-(defun esm/do-kill-proc (proc &optional kill-proc-buffer)
+(defun esm/do-kill-proc (proc)
   (when proc
 	(progn
 	  (with-current-buffer (procd-log-buffer proc)
@@ -61,7 +62,7 @@
   (let ((proc (cdr (assq (intern name) esm/services))))
 	(let ((result (esm/do-kill-proc proc kill-proc-buffer)))
 	  (setq esm/services (assq-delete-all (intern name) esm/services))
-	  (when kill-proc-buffer (esm/do-kill-buffer name))
+	  (when (kill-proc-buffer (procd-proc-obj proc)) (esm/do-kill-buffer name))
 	  result)))
 
 (defun esm/kill-all (&optional kill-proc-buffers)
@@ -72,6 +73,6 @@
 	  (setq result t)
 	  (esm/do-kill-proc (cdr proc) kill-proc-buffers)
 	  (setq esm/services (assq-delete-all (car proc) esm/services))
-	  (when kill-proc-buffers (esm/do-kill-buffer (car proc))))))
+	  (when (and kill-proc-buffers (procd-proc-obj proc)) (esm/do-kill-buffer (car proc))))))
   
 (provide 'eservice-manager)
